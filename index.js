@@ -12,22 +12,26 @@ fs.pathExists(pathTemp)
         }
         return;
     })
+    //On crée le dossier
     .then(() => {
         return fs.ensureDir(pathTemp)
-        .then(() => console.log('temp/ created'))
-        .catch(() => console.log('temp/ was not created'));
+            .then(() => console.log('temp/ created'))
+            .catch(() => console.log('temp/ was not created'));
     })
-    .then( () => {
+    //On lit le fichier contenant les pubs
+    .then(() => {
         return fs.readJSON('./pubsData.json')
-            .then(json => json)
+            .then(json => {
+                //On écrit le fichier tmp/pubs.json
+                return fs.writeJson(pathPubs, json)
+                    .then(() => console.log('pubs.json writen !'))
+                    .catch(() => console.log('couldn\'t write json'));
+
+            })
             .catch(() => console.log('couldn\'t read Json'));
     })
-    .then( json => {
-        return fs.writeJson(pathPubs, json)
-            .then( () => console.log('pubs.json writen !'))
-            .catch( () => console.log('couldn\'t write json'));
-    })
-    .then( 
+    //Et on écout les modifs sur le fichier
+    .then(
         fs.watchFile(pathPubs, (curr, prev) => {
             console.log(`the current mtime is: ${curr.mtime}`);
             console.log(`the previous mtime was: ${prev.mtime}`);
